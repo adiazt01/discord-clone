@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import {
   ClerkProvider,
   SignedIn,
@@ -9,6 +10,8 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
+import { extractRouterConfig } from "uploadthing/server";
+import { ourFileRouter } from "./api/uploadthing/core";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -42,6 +45,7 @@ export default function RootLayout({
             storageKey="discord-theme"
             disableTransitionOnChange
           >
+            <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
             <SignedOut>
               <SignInButton />
             </SignedOut>
