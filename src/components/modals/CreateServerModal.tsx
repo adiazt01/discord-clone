@@ -21,25 +21,20 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
 import { FileUpload } from "@/components/file-upload";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useModalStore } from "@/hooks/useModalStore";
 
 const formSchema = z.object({
   name: z.string().min(1).max(100),
   imageUrl: z.string().url().optional(),
 });
 
-export default function InitialModal() {
-  const [isMounted, setIsMounted] = useState(false);
+export default function CreateServerModal() {
   const router = useRouter();
-
-  useEffect(() => {
-    return () => {
-      setIsMounted(true);
-    };
-  }, []);
+  const { isOpen, onClose, modalType } = useModalStore();
+  const isModalOpen = isOpen && modalType === "createServer";
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -57,18 +52,19 @@ export default function InitialModal() {
 
       form.reset();
       router.refresh();
-      window.location.reload();
+      onClose();
     } catch (error) {
       console.error(error);
     }
   };
 
-  if (!isMounted) {
-    return null;
-  }
+  const handleClose = () => {
+    form.reset();
+    onClose();
+  };
 
   return (
-    <Dialog open>
+    <Dialog open={isModalOpen} onOpenChange={handleClose}>
       <DialogContent className="bg-white text-black p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">

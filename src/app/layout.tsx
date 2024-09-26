@@ -12,6 +12,7 @@ import {
 import { ThemeProvider } from "@/components/theme-provider";
 import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "./api/uploadthing/core";
+import { ModalProvider } from "@/components/providers/ModalProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -40,12 +41,13 @@ export default function RootLayout({
         <body>
           <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
+            defaultTheme="system"
             enableSystem
             storageKey="discord-theme"
             disableTransitionOnChange
           >
             <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
+            <ModalProvider />
             <SignedOut>
               <SignInButton />
             </SignedOut>
