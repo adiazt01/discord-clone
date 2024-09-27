@@ -9,72 +9,63 @@ datasource db {
 }
 
 model Profile {
-  id       String @id @default(cuid())
-  userId   String @unique
-  name     String
-  imageUrl String @db.Text
-  email    String @db.Text
-
-  servers Server[]
-
+  id        String    @id @default(cuid())
+  userId    String    @unique
+  name      String
+  imageUrl  String
+  email     String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  Member    Member[]
   Channel   Channel[]
+  Member    Member[]
+  servers   Server[]
 }
 
 model Server {
-  id         String @id @default(cuid())
+  id         String    @id @default(cuid())
   name       String
-  imageUrl   String @db.Text
-  inviteCode String @db.Text
+  imageUrl   String
+  inviteCode String
+  profileId  String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  channels   Channel[]
+  members    Member[]
+  profile    Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
 
+model Member {
+  id        String     @id @default(cuid())
+  role      MemberRole
   profileId String
-  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  serverId  String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  profile   Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  server    Server     @relation(fields: [serverId], references: [id])
+}
 
-  members Member[]
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  channels  Channel[]
+model Channel {
+  id        String      @id @default(cuid())
+  name      String
+  type      ChannelType @default(TEXT)
+  profileId String
+  serverId  String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  profile   Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  server    Server      @relation(fields: [serverId], references: [id])
 }
 
 enum MemberRole {
   ADMIN
   MEMBER
   GUEST
-}
-
-model Member {
-  id   String     @id @default(cuid())
-  role MemberRole
-
-  profileId String
-  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade) // Cambiado a `id`
-
-  serverId String
-  server   Server @relation(fields: [serverId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  MODERATOR
 }
 
 enum ChannelType {
   TEXT
   VOICE
-}
-
-model Channel {
-  id   String      @id @default(cuid())
-  name String
-  type ChannelType @default(TEXT)
-
-  profileId String
-  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade) // Cambiado a `id`
-
-  serverId String
-  server   Server @relation(fields: [serverId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  AUDIO
 }

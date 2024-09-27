@@ -48,12 +48,6 @@ export default function RootLayout({
           >
             <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
             <ModalProvider />
-            <SignedOut>
-              <SignInButton />
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
             {children}
           </ThemeProvider>
         </body>
