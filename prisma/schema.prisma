@@ -42,7 +42,7 @@ model Member {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   profile   Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  server    Server     @relation(fields: [serverId], references: [id])
+  server    Server     @relation(fields: [serverId], references: [id], onDelete: Cascade)
 }
 
 model Channel {
@@ -54,7 +54,7 @@ model Channel {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
   profile   Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  server    Server      @relation(fields: [serverId], references: [id])
+  server    Server      @relation(fields: [serverId], references: [id], onDelete: Cascade)
 }
 
 enum MemberRole {
@@ -66,6 +66,6 @@ enum MemberRole {
 
 enum ChannelType {
   TEXT
-  VOICE
+  VIDEO
   AUDIO
 }
