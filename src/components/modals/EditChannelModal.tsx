@@ -48,40 +48,39 @@ const formSchema = z.object({
   type: z.nativeEnum(ChannelType),
 });
 
-export default function CreateChannelModal() {
+export default function EditChannelModal() {
   const router = useRouter();
   const { isOpen, onClose, modalType, data } = useModalStore();
-  const isModalOpen = isOpen && modalType === "createChannel";
+  const isModalOpen = isOpen && modalType === "editChannel";
   const params = useParams();
+  const { channel, server } = data;
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      type: ChannelType.TEXT,
+      type: channel?.type || ChannelType.TEXT,
     },
   });
 
   const isLoading = form.formState.isSubmitting;
-  const { channelType } = data;
 
   useEffect(() => {
-    if (channelType && Object.values(ChannelType).includes(channelType)) {
-      form.setValue("type", channelType as ChannelType);
-    } else {
-      form.setValue("type", ChannelType.TEXT);
+    if (channel) {
+      form.setValue("name", channel.name);
+      form.setValue("type", channel.type);
     }
-  }, [channelType, form]);
+  }, [form, channel]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const url = qs.stringifyUrl({
-        url: "/api/channels",
+        url: `/api/channels/${channel?.id}`,
         query: {
-          serverId: params?.serverId,
+          serverId: server?.id,
         },
       });
-      await axios.post(url, values);
+      await axios.patch(url, values);
 
       form.reset();
       router.refresh();
@@ -99,14 +98,13 @@ export default function CreateChannelModal() {
   return (
     <Dialog open={isModalOpen} onOpenChange={handleClose}>
       <DialogContent className="bg-white text-black p-0 overflow-hidden">
-        <DialogHeader className="pt-8 px-6">
+        <DialogHeader
+          className="pt
+          -8 px-6"
+        >
           <DialogTitle className="text-2xl text-center font-bold">
-            Create a Channel
+            Edit Channel
           </DialogTitle>
-          <DialogDescription className="text-center text-zinc-500">
-            Channels are where your team communicates. They’re best when
-            organized around a topic — #leads, for example.
-          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -163,7 +161,7 @@ export default function CreateChannelModal() {
             />
             <DialogFooter>
               <Button type="submit" disabled={isLoading} className="w-full">
-                Create Channel
+                Edit Channel
               </Button>
             </DialogFooter>
           </form>

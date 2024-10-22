@@ -5,6 +5,7 @@ import { Channel, ChannelType, MemberRole, Server } from "@prisma/client";
 import { Edit, Hash, Headphones, Lock, Trash, Video } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { ActionTooltip } from "../ActionTooltip";
+import { ModalType, useModalStore } from "@/hooks/useModalStore";
 interface ServerChannelProps {
   channel: Channel;
   server: Server;
@@ -18,10 +19,20 @@ const iconMap = {
 };
 
 export function ServerChannel({ channel, server, role }: ServerChannelProps) {
+  const { onOpen } = useModalStore();
   const params = useParams();
   const router = useRouter();
 
   const Icon = iconMap[channel.type];
+
+  const onClick = () => {
+    router.push(`/server/${params?.serverId}/channel/${channel.id}`);
+  };
+
+  const onAction = (e: React.MouseEvent, action: ModalType) => {
+    e.stopPropagation();
+    onOpen(action, { server, channel });
+  };
 
   return (
     <button
@@ -30,6 +41,7 @@ export function ServerChannel({ channel, server, role }: ServerChannelProps) {
         params?.channelId === channel.id &&
           "bg-zinc-700 dark:bg-zinc-800 dark:bg-opacity-50",
       )}
+      onClick={onClick}
     >
       <Icon className="flex-shrink-0 size-5 text-zinc-500" />
       <span
@@ -44,10 +56,16 @@ export function ServerChannel({ channel, server, role }: ServerChannelProps) {
       {channel.name !== "general" && role !== MemberRole.GUEST && (
         <div className="ml-auto flex items-center gap-x-2">
           <ActionTooltip label="Edit">
-            <Edit className="size-4 hidden group-hover:block text-zinc-500 dark:text-zinc-400" />
+            <Edit
+              className="size-4 hidden group-hover:block text-zinc-500 dark:text-zinc-400"
+              onClick={(e) => onAction(e, "editChannel")}
+            />
           </ActionTooltip>
           <ActionTooltip label="Delete">
-            <Trash className="size-4 hidden group-hover:block text-zinc-500 dark:text-zinc-400" />
+            <Trash
+              onClick={(e) => onAction(e, "deleteChannel")}
+              className="size-4 hidden group-hover:block text-zinc-500 dark:text-zinc-400"
+            />
           </ActionTooltip>
         </div>
       )}
